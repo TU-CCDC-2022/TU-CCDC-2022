@@ -1,0 +1,144 @@
+#!/bin/sh
+#draft scripted by skyenet
+
+
+#Make placeholder for furture monitor program
+sudo touch /home/.monitor.sh
+sudo chmod +x /home/.monitor.sh
+sudo chmod 777 /home/.monitor.sh
+
+#Makes blank compare files of base files, processes, and services
+sudo mkdir /home/.files
+sudo touch /home/.files/compareProc.txt
+sudo touch /home/.files/compareGrb.txt
+sudo touch /home/.files/compareBash.txt
+sudo touch /home/.files/compareTimers.txt
+sudo touch /home/.files/compareShell.txt
+sudo touch /home/.files/comparePssswd.txt
+sudo touch /home/.files/comparePorts.txt
+sudo touch /home/.files/compareSstmd.txt
+
+chmod 777 /home/.files/compareProc.txt
+chmod 777 /home/.files/compareGrb.txt
+chmod 777 /home/.files/compareBash.txt
+chmod 777 /home/.files/compareTimers.txt
+chmod 777 /home/.files/compareShell.txt
+chmod 777 /home/.files/comparePasswd.txt
+chmod 777 /home/.files/comparePorts.txt
+chmod 777 /home/.files/compareSstmd.txt
+
+
+
+sudo mkdir /home/.infect
+sudo touch /home/.infect/Proci.txt
+sudo touch /home/.infect/Grbi.txt
+sudo touch /home/.infect/Bashi.txt
+sudo touch /home/.infect/Timersi.txt
+sudo touch /home/.infect/Shelli.txt
+sudo touch /home/.infect/Passwdi.txt
+
+
+chmod 777 /home/.infect/compareProci.txt
+chmod 777 /home/.infect/compareGrbi.txt
+chmod 777 /home/.infect/compareBashi.txt
+chmod 777 /home/.infect/compareTimersi.txt
+chmod 777 /home/.infect/compareShelli.txt
+chmod 777 /home/.infect/comparePasswdi.txt
+chmod 777 /home/.infect/comparePortsi.txt
+chmod 777 /home/.infect/compareSstmdi.txt
+
+
+
+
+#Feeds base files into files to compare with 
+sudo ps -aux > /.files/compareProc.txt
+sudo cp /boot/grub/grub.cfg /home/.files/compareGrb.txt
+sudo cp /etc/bash.bashrc /home/.files/compareBash.txt
+sudo systemctl list-timers > /home/.files/compareTimers.txt
+sudo cat /etc/shells > /home/.files/compareShell.txt
+sudo cat /etc/Passwd > /home/.files/comparePasswd.txt
+sudo cat ss > /home/.files/comparePorts.txt
+sudo systemd > /home/.files/compareSstmd.txt
+
+#Makes compare files immutable
+
+sudo chmod 444 /home/.files/compareProc.txt
+sudo chmod 444 /home/.files/compareGrb.txt
+sudo chmod 444 /home/.files/compareBash.txt
+sudo chmod 444 /home/.files/compareTimers.txt
+sudo chmod 444 /home/.files/compareShell.txt
+sudo chmod 444 /home/.files/compareShdw.txt
+sudo chmod 444 /home/.files/comparePorts.txt
+sudo chmod 444 /home/.files/compareSstmd.txt
+
+sudo chattr +i /home/.files/compareProc.txt
+sudo chattr +i /home/.files/compareGrb.txt
+sudo chattr +i /home/.files/compareBash.txt
+sudo chattr +i /home/.files/compareTimers.txt
+sudo chattr +i /home/.files/compareShell.txt
+sudo chattr +i /home/.files/compareShdw.txt
+sudo chattr +i /home/.files/comparePorts.txt
+sudo chattr +i /home/.files/compareSstmd.txt
+
+#Spawns other program to watch compare files for changes and send allert if changes are seen
+
+echo "
+#!/bin/bash
+grubCompare="/home/.files/compareGrb.txt"
+grubBase="/boot/grub/grub.cfg"
+bashrcCompare="/home/.files/compareBash.txt"
+bashrcBase="/etc/bash.bashrc"
+timersCompare="/home/.files/compareTimers.txt"
+timersBase="cat systemctl list-timers"
+passwdCompare="/home/.files/comparepasswd.txt"
+passwdBase="sudo cat etc/passwd"
+portsCompare="/home/.files/comparePorts.txt"
+portsBase="cat ss"
+systemdCompare="/home/.files/compareSstmd.txt"
+systemdBase="sudo systemd"
+#compare grubBase to grubCompare file to check for validity
+if [ -n "$(cmp $grubCompare $grubBase)"]
+then
+        echo "grub.cfg safe. no changes needed."
+else
+        echo -e "\a"
+        echo "Grub bootloader has been changed. Attempting to save possible infected file to infection"
+        #if grub.cfg has been changed, save infected grub.cfg to infect and rep>
+        sudo cp /boot/grub/grub.cfg /home/.infect/Grbi.txt
+        echo "Save attempt complete. Attempting to replace infected file with non-infected version."
+        vimdiff /home/.files/compareGrb.txt /home/.infect/Grbi.txt
+        sudo cat /home/.files/compareGrb.txt > /boot/grub/grub.cfg
+fi
+#compare bashBase to bashCompare file to check for validity
+if [ -n "$(cmp $bashCompare $bashBase)"]
+then
+        echo "bash.bashrc safe. no changes needed."
+else
+        echo -e "\a"
+        echo "bash.bashrc has been changed. Attempting to save possible infectd file to infection"
+       #if bash.bashrc has been changed, save infected bash.bashrc to infect and rep>
+        sudo cp /etc/bash.bashrc /home/.infect/Bashi.txt
+        echo "Save attempt complete. Attempting to copy non-infected bash.bashrc to /etc/bash.bashrc"
+        sudo vimdiff /home/.files/compareBash.txt /home/.infect/Bashi.txt
+        sudo cat /home/.files/compareBash.txt > /etc/bash.bashrc
+fi
+#compare passwordBase to passwdCompare file to check for validity
+if [ -n "$(cmp $passwdCompare $passwdBase)"]
+then
+        echo "No new users have been added. no changes needed."
+else
+        echo -e "\a"
+        echo "Users have been added. remove them with the userdel command [userdel [username]]"
+        echo "storing modified files to infection"
+        #if bash.bashrc has been changed, save infected bash.bashrc to infect and rep>
+        sudo cp /etc/passwd /home/.infect/Passwdi.txt
+        echo "Save attempt complete. Compare files with [sudo vimdiff /home/.files/compareBash.txt /home/.infect/Bashi.txt] and remove the anamalies with the userdel command."
+        #sudo vimdiff /home/.files/Passwd.txt /home/.infect/Passwdi.txt
+fi
+" > /home/.monitor.sh
+
+sudo chattr +i /home/.monitor.sh
+<Make a chronjob here that runs the scanner every 5 minutes.>
+
+
+rm -ra <This Program's Name>
