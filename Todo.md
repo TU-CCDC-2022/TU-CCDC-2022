@@ -21,6 +21,7 @@
 * Samba
 * Secure Shell (SSH)
 * SQL
+* LDAP
 * Syslog
 * Virtual Private Networking (VPN)/remote access
 * Web servers (both Apache and IIS)
