@@ -9,4 +9,4 @@
 # Download Process Hacker
 
 # Download Vim for automated threathunt script
-(New-Object System.Net.Webclient).DownloadFile("https://github.com/vim/vim-win32-installer/releases/download/v8.2.2825/gvim_8.2.2825_x86_signed.exe", vimInstall.exe)
+(New-Object System.Net.Webclient).DownloadFile("https://github.com/vim/vim-win32-installer/releases/download/v8.2.2825/gvim_8.2.2825_x86_signed.exe", "vimInstall.exe")
