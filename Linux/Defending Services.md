@@ -36,3 +36,5 @@
 # Securing DNS
 
 # Securing MYSQL
+
+# Securing PHP
