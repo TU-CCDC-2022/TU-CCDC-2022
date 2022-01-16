@@ -37,36 +37,66 @@ echo "Protocol 2" >> /etc/ssh/sshd_config
 sed -i "/LogLevel.*/s/^#//g" /etc/ssh/sshd_config
 
 # Set SSH MaxAuthTries to 3
-sed -i "s/#MaxAuthTries 6/MaxAuthTries 3/g" /etc/ssh/sshd_config
+sed -i "s/.*MaxAuthTries.*/MaxAuthTries 3/g" /etc/ssh/sshd_config
 
 # Enable SSH IgnoreRhosts
-sed -i "/IgnoreRhosts.*/s/^#//g" /etc/ssh/sshd_config
+sed -i "s/.*IgnoreRhosts.*/IgnoreRhosts yes/g" /etc/ssh/sshd_config
+
+# Disable Pam
+sed -i "s/.*UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
+
+sed -i "s/.*PubkeyAuthentication.*/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
 
 # Disable SSH HostbasedAuthentication
-sed -i "/HostbasedAuthentication.*no/s/^#//g" /etc/ssh/sshd_config
+sed -i "s/.*HostbasedAuthentication.*/HostbasedAuthentication no/g" /etc/ssh/sshd_config
 
 # Disable SSH root login
-sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin no/g" /etc/ssh/sshd_config
+sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config
 
 # Deny Empty Passwords
-sed -i "/PermitEmptyPasswords.*no/s/^#//g" /etc/ssh/sshd_config
+sed -i "s/.*PermitEmptyPasswords.*/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+
+# Deny Password Auth
+
+sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no/g" /etc/ssh/sshd_config
 
 # Deny Users to set environment options through the SSH daemon
 sed -i "/PermitUserEnvironment.*no/s/^#//g" /etc/ssh/sshd_config
 
 # Allow only approved ciphers
+
+if grep -w "Ciphers aes256-ctr" /etc/ssh/sshd_config;
+then
+    echo "Ciphers aes256-ctr exists"
+else
 echo "Ciphers aes256-ctr" >> /etc/ssh/sshd_config
+fi
 
 # Set MAC
+
+if grep -w "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256" /etc/ssh/sshd_config;
+then
+    echo "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256 exists"
+else
 echo "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256" >> /etc/ssh/sshd_config
+fi
+
+# Disable Tunnelling 
+
+if grep -w "AllowTcpForwarding" /etc/ssh/sshd_config;
+then
+    sed -i "s/.*AllowTcpForwarding.*/AllowTcpForwarding no/g" /etc/ssh/sshd_config
+else
+echo "AllowTcpForwarding no" >> /etc/ssh/sshd_config
+fi
 
 # Configure SSH Idle Timeout Interval
-sed -i "s/#ClientAliveInterval 0/ClientAliveInterval 300/g" /etc/ssh/sshd_config
-sed -i "s/#ClientAliveCountMax 3/ClientAliveCountMax 0/g" /etc/ssh/sshd_config
+sed -i "s/.*ClientAliveInterval.*/ClientAliveInterval 300/g" /etc/ssh/sshd_config
+sed -i "s/.*ClientAliveCountMax.*/ClientAliveCountMax 0/g" /etc/ssh/sshd_config
 
 # Set Banner
-sed -i "s/#Banner none/Banner \/etc\/issue\.net/g" /etc/ssh/sshd_config
-echo "Welcome" > /etc/issue.net
+sed -i "s/#Banner.*/Banner \/etc\/issue\.net/g" /etc/ssh/sshd_config
+#echo "Welcome" > /etc/issue.net
 
 # Allow wheel group use ssh
 #echo "AllowGroups wheel" >> /etc/ssh/sshd_config
@@ -74,4 +104,5 @@ echo "Welcome" > /etc/issue.net
 # Disable X11 forwarding
 sed -i "s/X11Forwarding yes/#X11Forwarding yes/g" /etc/ssh/sshd_config
 
-service sshd restart
+service ssh restart
+systemctl restart sshd
