@@ -920,13 +920,13 @@ function main(){
 
     echo "$FUNCNAME: ${GREEN}Running harden_service.sh...${NC}"
 
-    # update || panic
-    # enable_security_updates || panic 
+    update || panic
+    enable_security_updates || panic 
     disable_root_account || panic
-    # disable_irqbalance || panic
-    # remove_irqbalance || panic
-    # remove_bluetooth || panic
-    # enable_only_tty1 || panic
+    disable_irqbalance || panic
+    remove_irqbalance || panic
+    remove_bluetooth || panic
+    enable_only_tty1 || panic
     secure_temp_directories || panic
 
     remove_usb_storage_driver || panic
@@ -954,14 +954,14 @@ function main(){
     create_desktop_timeout || panic
 
     change_system_banner || panic
-    # install_selinux || panic
+    install_selinux || panic
     configure_selinux || panic
 
     use_proper_sysctl || panic
 
     change_motd || panic
     
-    # always_kill_unwanted_programs || panic
+    always_kill_unwanted_programs || panic
 
     secure_shared_memory || panic
     reboot_when_out_of_memory || panic
@@ -976,9 +976,9 @@ function main(){
     disable_cups || panic
 
     # I do this so we don't accidentally kill our mail server...
-    if [ ! remove_dovecot ]; then
-        remove_dovecot || panic
-    fi
+    # if [ ! remove_dovecot ]; then
+    #     remove_dovecot || panic
+    # fi
     
 
     disable_modemmanager || panic
