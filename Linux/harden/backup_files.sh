@@ -18,7 +18,14 @@ cp /etc/sysctl.conf /run/usys/sysctl.conf
 cp /etc/default/useradd /run/usys/useradd
 cp /var/spool/cron/crontabs/root /run/usys/root1crontab
 cp /var/spool/cron/root /run/usys/root2crontab
+cp /etc/hosts /run/usys/hosts
+cp /etc/resolv.conf /run/usys/resolv.conf
 cp -r /var/www/html /run/usys/html
+
+netstat -antup > /run/usys/netstatres
+ss -antup > /run/usys/ss
+ps -eo command > /run/usys/psres
+
 
 # Processes
 
@@ -33,12 +40,24 @@ cp `which last` /run/usys/last
 cp `which top` /run/usys/top
 cp `which w` /run/usys/w
 cp `which ls` /run/usys/ls
-cp `which kill` /run/usys/kill0
-cp `which crontab` /run/usys/
+cp `which kill` /run/usys/kill
+cp `which strings` /run/usys/strings
+cp `which passwd` /run/usys/passwd
+cp `which sudo` /run/usys/sudo
 
 # IPFS Implementation
+cd /var/tmp
+wget https://dist.ipfs.io/go-ipfs/v0.11.0/go-ipfs_v0.11.0_linux-amd64.tar.gz --no-check-certificate
+tar -xvzf go-ipfs_v0.11.0_linux-amd64.tar.gz
+cd go-ipfs
+sudo bash install.sh
+cd /run/usys
+ipfs init
+ipfs daemon &
 
-# Soon...
+tar -zcvf /run/kab$HOSTNAME.tar.gz /run/usys
+
+ipfs add /run/kab$HOSTNAME.tar.gz > /run/hash.sh
 
 if [ -f $apt ]; then
 apt install git -y
@@ -47,3 +66,4 @@ yum install git -y
 fi
 
 git init /run/usys
+cat /run/hash.sh

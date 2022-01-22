@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author: John Hammond
+# Author: John Hammond (Modified by Ezekiel Aina)
 # Date: 28MAR2016
 # Description:
 #    harden_services.sh aims to offer all the functionality given in the "harden library"
@@ -19,6 +19,8 @@ GREEN=`tput setaf 2`                        # code for green text
 YELLOW=`tput setaf 3`                       # code for yellow text
 NC=`tput sgr0`                              # Reset the text color
 
+yum install dnf -y
+echo "y" | dnf install yum
 
 function update(){
 
@@ -26,10 +28,8 @@ function update(){
     # hardenubuntu.com/hardenubuntu.com/initial-setup/system-updates.html
 
     echo "$FUNCNAME: ${GREEN}Updating your machine...${NC}"
-    apt-get update
-    echo "y" |  apt-get upgrade
-    apt-get autoremove
-    apt-get autoclean
+    yum update -y
+    dnf check-update
 }
 
 function enable_security_updates(){
@@ -38,8 +38,8 @@ function enable_security_updates(){
     # hardenubuntu.com/hardenubuntu.com/initial-setup/system-updates.html
 
     echo "$FUNCNAME: ${GREEN}Enabling security updates...${NC}"
-    apt-get install unattended-upgrades
-    dpkg-reconfigure -plow unattended-upgrades
+    sudo dnf update --security 
+    sudo dnf upgrade --security 
 }
 
 function disable_root_account(){
@@ -100,7 +100,7 @@ function remove_irqbalance(){
 
     echo "$FUNCNAME: ${GREEN}Removing IRQBalance...${NC}"
     
-    echo "y" | apt-get purge irqbalance
+    echo "y" | yum remove irqbalance -y
 }
 
 function remove_bluetooth(){
@@ -110,7 +110,7 @@ function remove_bluetooth(){
 
     echo "$FUNCNAME: ${GREEN}Removing Bluetooth...${NC}"
     
-    echo "y" | apt-get purge bluez
+    echo "y" | yum remove bluez -y
 }
 
 function enable_only_tty1(){
@@ -275,7 +275,7 @@ function disable_compilers(){
     # This function is seemingly unnecessary after testing; the Ubuntu Server
     # does not come with any compilers pre-installed!
 
-    echo "$FUNCNAME: ${GREEN}Disabling the use of common compilers...${NC}"
+    echo "$FUNCNAME: ${GREEN}Disabling the use of common compilers/python...${NC}"
 
     compilers=(
             "/usr/bin/byacc"
@@ -286,6 +286,10 @@ function disable_compilers(){
             "/usr/bin/gcc"
             "/usr/bin/c++"
             "/usr/bin/g++"
+            "/usr/bin/python2"
+            "/usr/bin/python2.7"
+            "/usr/bin/python3"
+            "/usr/bin/python3.6"
         )
 
     for compiler in ${compilers[@]}; do
@@ -325,7 +329,7 @@ function remove_apport(){
 
     echo "$FUNCNAME: ${GREEN}Removing the apport service...${NC}"
 
-    echo "y" | apt-get purge apport
+    echo "y" | yum remove apport -y
 }
 
 
@@ -348,7 +352,7 @@ function remove_atd(){
 
     echo "$FUNCNAME: ${GREEN}Removing the atd service...${NC}"
     if command_exists at; then
-        echo "y" | apt-get purge at
+        echo "y" | yum remove at
     fi
         
 }
@@ -382,7 +386,7 @@ function remove_avahi(){
 
     echo "$FUNCNAME: ${GREEN}Removing the avahi service...${NC}"
 
-    echo 'y' | apt-get remove avahi-daemon avahi-utils
+    echo 'y' | yum remove avahi-daemon avahi-utils
 }
 
 function disable_bluetooth(){
@@ -413,7 +417,7 @@ function remove_cups(){
 
     echo "$FUNCNAME: ${GREEN}Removing the cups service...${NC}"
 
-    echo "y" | apt-get remove cups
+    echo "y" | yum remove cups
 }
 
 
@@ -424,7 +428,7 @@ function remove_dovecot(){
 
     echo "$FUNCNAME: ${GREEN}Removing the dovecot service...${NC}"
 
-    echo "y" | apt-get purge dovecot-*
+    echo "y" | yum remove dovecot-*
 }
 
 function disable_modemmanager(){
@@ -444,7 +448,7 @@ function remove_modemmanager(){
 
     echo "$FUNCNAME: ${GREEN}Removing the modemmanager service...${NC}"
 
-    echo "y" | apt-get purge modemmanager
+    echo "y" | yum remove modemmanager
 }
 
 function remove_nfs(){
@@ -454,7 +458,7 @@ function remove_nfs(){
 
     echo "$FUNCNAME: ${GREEN}Removing the NFS functionality...${NC}"
 
-    echo "y" | apt-get purge nfs-kernel-server nfs-common portmap rpcbind autofs
+    echo "y" | yum remove nfs-kernel-server nfs-common portmap rpcbind autofs
 }
 
 
@@ -467,7 +471,7 @@ function remove_snmp(){
 
     echo "$FUNCNAME: ${GREEN}Removing the SNMP functionality service...${NC}"
 
-    echo "y" | apt-get purge --auto-remove snmp
+    echo "y" | yum remove --auto-remove snmp
 }
 
 
@@ -478,7 +482,7 @@ function remove_telnet(){
 
     echo "$FUNCNAME: ${GREEN}Removing Telnet (thank god)...${NC}"
     if command_exists telnet; then
-        echo "y" | apt-get purge telnetd inetutils-telnetd telnetd-ssl
+        echo "y" | yum remove telnetd inetutils-telnetd telnetd-ssl
     fi
 }
 
@@ -488,7 +492,7 @@ function remove_whoopsie(){
     # http://hardenubuntu.com/disable-services/disable-telnet/
 
     echo "$FUNCNAME: ${GREEN}Removing the Whoopsie service...${NC}"
-    echo "y" | apt-get purge whoopsie
+    echo "y" | yum remove whoopsie
 }
 
 function remove_zeitgeist(){
@@ -500,7 +504,7 @@ function remove_zeitgeist(){
 
     echo "$FUNCNAME: ${GREEN}Removing the Zeitgeist service...${NC}"
 
-    echo "y" | apt-get purge zeitgeist-core zeitgeist-datahub python-zeitgeist rhythmbox-plugin-zeitgeist zeitgeist
+    echo "y" | yum remove zeitgeist-core zeitgeist-datahub python-zeitgeist rhythmbox-plugin-zeitgeist zeitgeist
 }
 
 function disable_gnome_automounting(){
@@ -827,13 +831,23 @@ function install_selinux(){
     if ! command_exists sestatus; then
         ifdown eth0
         ifdown eth1
-        ifup eth1
-        
-        apt-get -y install selinux-basics
-
-        ifdown eth1
-        ifdown eth0
+        ifdown ens33
+        ifdown ens32
         ifup eth0
+        ifup eth1
+        ifup ens33
+        ifup ens33
+        
+        yum -y install selinux-basics
+
+        ifdown eth0
+        ifdown eth1
+        ifdown ens33
+        ifdown ens32
+        ifup eth0
+        ifup eth1
+        ifup ens33
+        ifup ens33
     fi
 }
 

@@ -72,6 +72,10 @@ else
 echo "Ciphers aes256-ctr" >> /etc/ssh/sshd_config
 fi
 
+# Allow users
+
+# echo "AllowUsers root" >> /etc/ssh/sshd_config
+
 # Set MAC
 
 if grep -w "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256" /etc/ssh/sshd_config;
@@ -90,6 +94,20 @@ else
 echo "AllowTcpForwarding no" >> /etc/ssh/sshd_config
 fi
 
+if grep -w "PermitTunnel" /etc/ssh/sshd_config;
+then
+    sed -i "s/.*PermitTunnel.*/PermitTunnel no/g" /etc/ssh/sshd_config
+else
+echo "PermitTunnel no" >> /etc/ssh/sshd_config
+fi
+
+if grep -w "AllowAgentForwarding" /etc/ssh/sshd_config;
+then
+    sed -i "s/.*AllowAgentForwarding.*/AllowAgentForwarding no/g" /etc/ssh/sshd_config
+else
+echo "AllowAgentForwarding no" >> /etc/ssh/sshd_config
+fi
+
 # Configure SSH Idle Timeout Interval
 sed -i "s/.*ClientAliveInterval.*/ClientAliveInterval 300/g" /etc/ssh/sshd_config
 sed -i "s/.*ClientAliveCountMax.*/ClientAliveCountMax 0/g" /etc/ssh/sshd_config
@@ -104,5 +122,6 @@ sed -i "s/#Banner.*/Banner \/etc\/issue\.net/g" /etc/ssh/sshd_config
 # Disable X11 forwarding
 sed -i "s/X11Forwarding yes/#X11Forwarding yes/g" /etc/ssh/sshd_config
 
+service sshd reload
 service ssh restart
 systemctl restart sshd

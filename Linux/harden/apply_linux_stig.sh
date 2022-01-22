@@ -91,8 +91,8 @@ sudo sed -i 's/Compression/Compression no #/g' /etc/ssh/sshd_config
 # V-72275
 sudo sed -i "s/.*lastlog.*/session required pam_lastlog.so showfailed/g" /etc/pam.d/login
 
-# V-72303
-sudo sed -i "s/.*X11Forwarding.*/X11Forwarding yes/g" /etc/ssh/sshd_config
+# V-72303 (changed)
+sudo sed -i "s/.*X11Forwarding.*/X11Forwarding no/g" /etc/ssh/sshd_config
 
 # V-72309
 sudo sed -i "s/.*net\.ipv4\.ip_forward.*/net.ipv4.ip_forward = 0 # SET BY STIG/g" /etc/sysctl.conf
