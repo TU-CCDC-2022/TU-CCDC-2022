@@ -1,0 +1,9 @@
+#   Add this to your hosts file to have access to the scoring systems
+sb.cybercargo.net 10.10.250.10
+mail.cybercargo.net 10.10.250.11
+ci.cybercargo.net 10.10.250.12
+dc1 10.10.1xx.10
+gts 10.10.1xx.11
+git 10.10.1xx.105
+ca 10.10.1xx.203
+docker 10.10.1xx.237
