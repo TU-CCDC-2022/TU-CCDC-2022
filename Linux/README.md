@@ -103,9 +103,10 @@ echo "rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDCTZi2El4jTsSFi+aBYipBX1njhiye9nBq0VC0N5
 * * `find / -type f -mmin -30 -ls 2>/dev/null | grep -v '/sys\| /proc\| /run'` => look for sus files
 * Check apache logs
 * * `grep "flag" /var/log/apache2/access.log` || /var/log/apache2/error.log`
-* Watch system timers `watch -d systemctl list-timers`
+* Watch system timers `watch -d systemctl list-timers` `/etc/systemd/system/` `/usr/lib/systemd/system/` `/etc/systemd/system/multi-user.target.wants/` 
 * Check for other authorized keys `find /root /home -type f -name "authorized_keys*" -exec md5sum {} \;`
 * Look out for tampered files `sudo ausearch -k logz | sudo aureport -f -i`
+* Look for reverse shells `grep -R '/dev/tcp/10.10' /etc`
 
 # Search and Destroy
 * check all processes (parent and child) `ps -eaf --forest`
@@ -116,3 +117,20 @@ echo "rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDCTZi2El4jTsSFi+aBYipBX1njhiye9nBq0VC0N5
 * * grep 'timestamp' -B 10 -A 10 /var.log/auth.log
 * Check current working dir in logs e.g `cwd:/path`
 * Open network capture in wireshark => `CTRL + f` => `change display filter to string and Packet list to bytes`
+
+# Bashrc
+
+```
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+```

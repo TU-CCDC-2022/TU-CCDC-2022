@@ -74,7 +74,7 @@ fi
 
 # Allow users
 
-# echo "AllowUsers root" >> /etc/ssh/sshd_config
+echo "AllowUsers sysboss" >> /etc/ssh/sshd_config
 
 # Set MAC
 
